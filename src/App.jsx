@@ -80,16 +80,15 @@ function useTilt(strength = 8) {
 }
 
 // scroll-reveal — blur/fade/slide-up entrance via IntersectionObserver (Magic UI "BlurFade" style)
+const prefersReducedMotion = () =>
+  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 function useReveal({ threshold = 0.15 } = {}) {
   const ref = useRef(null);
-  const [shown, setShown] = useState(false);
+  const [shown, setShown] = useState(() => prefersReducedMotion());
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setShown(true);
-      return;
-    }
+    if (!el || prefersReducedMotion()) return;
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -166,7 +165,30 @@ function useTypewriter(phrases, { typeMs = 70, eraseMs = 35, holdMs = 1400, gapM
 // ============================================================
 // Topbar
 // ============================================================
-function Topbar({ lang, setLang, active }) {
+function ThemeToggle({ theme, onToggle }) {
+  const isDark = theme === "dark";
+  return (
+    <button
+      className="theme-toggle"
+      onClick={onToggle}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      title={isDark ? "라이트 모드" : "다크 모드"}>
+      {isDark ?
+        // sun
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+        </svg> :
+        // moon
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+      }
+    </button>);
+
+}
+
+function Topbar({ lang, setLang, theme, onToggleTheme, active }) {
   const now = useClock();
   const time = now.toLocaleTimeString("en-US", { hour12: false });
   const navIds = ["home", "about", "timeline", "work", "playground", "contact"];
@@ -187,6 +209,7 @@ function Topbar({ lang, setLang, active }) {
         <span className="status-clock">
           <span>SEOUL</span><span>{time}</span>
         </span>
+        <ThemeToggle theme={theme} onToggle={onToggleTheme} />
         <div className="lang-toggle">
           <button className={lang === "ko" ? "on" : ""} onClick={() => setLang("ko")}>KO</button>
           <button className={lang === "en" ? "on" : ""} onClick={() => setLang("en")}>EN</button>
@@ -200,7 +223,6 @@ function Topbar({ lang, setLang, active }) {
 // Hero
 // ============================================================
 function Hero({ lang }) {
-  const m = DATA.meta;
   const rolesKo = ["프론트엔드", "백엔드", "UI / UX 지향", "문제 해결사", "지속적 학습자"];
   const rolesEn = ["FRONTEND ENGINEER", "BACKEND ENGINEER", "UI / UX MINDED", "PROBLEM SOLVER", "LIFELONG LEARNER"];
   const phrases = lang === "ko" ? rolesKo : rolesEn;
@@ -574,10 +596,26 @@ function Footer() {
 
 export default function App() {
   const [lang, setLang] = useState("ko");
+  const [theme, setTheme] = useState(() => {
+    if (typeof document !== "undefined") {
+      return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+    }
+    return "light";
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    try { localStorage.setItem("theme", theme); } catch { /* ignore */ }
+    // notify the Three.js background to recolour
+    window.dispatchEvent(new CustomEvent("themechange", { detail: theme }));
+  }, [theme]);
+
+  const toggleTheme = () => setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+
   const active = useScrollSpy(["home", "about", "timeline", "work", "playground", "contact"]);
   return (
     <>
-      <Topbar lang={lang} setLang={setLang} active={active} />
+      <Topbar lang={lang} setLang={setLang} theme={theme} onToggleTheme={toggleTheme} active={active} />
       <Hero lang={lang} />
       <About lang={lang} />
       <Timeline lang={lang} />

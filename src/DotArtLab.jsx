@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { DOT_ART_TEMPLATES } from './dotArtData';
 
 const ASCII_CHARS = " .:-=+*#%@";
