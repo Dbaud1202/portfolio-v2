@@ -20,8 +20,11 @@
   </script>
 </head>
 <body>
-  <!-- fixed Three.js background canvas -->
-  <canvas id="three-bg"></canvas>
+  <!-- fixed 3D keyboard background (Spline). The canvas is sized to fill this
+       fixed wrapper; the Spline runtime sizes the canvas to its parent. -->
+  <div id="bg-wrap">
+    <canvas id="three-bg"></canvas>
+  </div>
 
   <div id="root"></div>
 
