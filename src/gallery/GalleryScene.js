@@ -17,6 +17,7 @@ const TILT_ANGLE_STEP = 0.135;
 const RING_RADIUS = 4.7;
 const GALLERY_COL_GAP = 1.6;
 const BG_COLOR = 0x0e0e10;
+const BG_COLOR_LIGHT = 0xf3f2ee;
 const MAX_DPR = 2;
 const WHEEL_SENSITIVITY = 0.0016;
 const DRAG_SENSITIVITY = 0.006;
@@ -224,6 +225,13 @@ export class GalleryScene {
   setInputEnabled(enabled) {
     this.inputEnabled = enabled;
     if (!enabled && this.focusedIndex !== null) this.setFocus(null);
+  }
+
+  /** @param {'dark'|'light'} theme */
+  setTheme(theme) {
+    const color = theme === 'light' ? BG_COLOR_LIGHT : BG_COLOR;
+    this.scene.background.set(color);
+    this.scene.fog.color.set(color);
   }
 
   // collapse cards back to the center so they bloom outward again —
