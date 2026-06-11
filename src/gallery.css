@@ -51,6 +51,141 @@ html, body {
     radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(0, 0, 0, 0.4) 100%);
 }
 
+/* ---------- intro hero ---------- */
+
+.hero {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 14px;
+  padding: 24px;
+  background:
+    radial-gradient(90% 70% at 50% 38%, rgba(38, 40, 52, 0.55) 0%, transparent 60%),
+    var(--bg);
+  transition: opacity 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0s linear 0s;
+}
+.hero.hero-hidden {
+  opacity: 0;
+  transform: translateY(-7vh);
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0s linear 900ms;
+}
+
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.42em;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+}
+
+.hero-name {
+  margin: 0;
+  font-size: clamp(56px, 11vw, 132px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+}
+.hero-name-en {
+  display: block;
+  font-size: clamp(16px, 2.4vw, 26px);
+  font-weight: 500;
+  letter-spacing: 0.55em;
+  color: var(--ink-dim);
+  margin-top: 14px;
+  text-indent: 0.55em; /* balance the tracking */
+}
+
+.hero-role {
+  margin: 6px 0 0;
+  font-family: var(--mono);
+  font-size: clamp(13px, 1.7vw, 17px);
+  letter-spacing: 0.16em;
+  color: var(--ink-dim);
+}
+.hero-typed { color: var(--ink); }
+.hero-caret {
+  display: inline-block;
+  width: 9px;
+  height: 1.05em;
+  margin-left: 4px;
+  vertical-align: text-bottom;
+  background: var(--ink);
+  animation: caret-blink 1s steps(1) infinite;
+}
+@keyframes caret-blink { 50% { opacity: 0; } }
+
+.hero-tagline {
+  margin: 8px 0 0;
+  max-width: 520px;
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--ink-dim);
+  word-break: keep-all;
+}
+
+.hero-meta {
+  display: flex;
+  gap: 26px;
+  margin-top: 10px;
+}
+.hero-meta a {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--ink-faint);
+  text-decoration: none;
+  transition: color 200ms ease;
+}
+.hero-meta a:hover { color: var(--ink); }
+
+.hero-scroll {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: transparent;
+  color: var(--ink-dim);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.34em;
+  padding: 13px 26px 13px 30px;
+  border-radius: 999px;
+  cursor: pointer;
+  margin-top: 34px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: color 200ms ease, border-color 200ms ease;
+}
+.hero-scroll:hover { color: var(--ink); border-color: rgba(255, 255, 255, 0.45); }
+.hero-scroll-arrow {
+  display: inline-block;
+  animation: arrow-bob 1.6s ease-in-out infinite;
+}
+@keyframes arrow-bob {
+  0%, 100% { transform: translateY(-2px); }
+  50% { transform: translateY(3px); }
+}
+
+/* gallery chrome stays hidden while the hero is up */
+.stage.is-intro .stage-header,
+.stage.is-intro .stage-footer {
+  opacity: 0;
+  pointer-events: none;
+}
+.stage-header, .stage-footer {
+  transition: opacity 700ms ease 250ms;
+}
+
 /* ---------- header ---------- */
 
 .stage-header {
@@ -66,7 +201,21 @@ html, body {
   pointer-events: none;
 }
 
-.stage-brand { display: flex; flex-direction: column; gap: 5px; }
+.stage-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  text-align: left;
+}
+.stage-brand:hover .stage-brand-sub { color: var(--ink-dim); }
 
 .stage-brand-title {
   font-family: var(--mono);
@@ -212,6 +361,9 @@ html, body {
   line-height: 1.7;
   color: var(--ink-dim);
   word-break: keep-all;
+  white-space: pre-line; /* timeline card uses line breaks */
+  max-height: 32vh;
+  overflow-y: auto;
 }
 
 .focus-stack {

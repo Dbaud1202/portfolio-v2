@@ -54,6 +54,7 @@ export class GalleryScene {
     this.cards = cards;
     this.callbacks = callbacks;
     this.layout = 'tilt';
+    this.inputEnabled = true; // host can pause input while an intro overlay is up
     this.scroll = (cards.length - 1) / 2; // start mid-row so cards spread both ways
     this.scrollVelocity = 0;
     this.focusedIndex = null;
@@ -159,10 +160,11 @@ export class GalleryScene {
       this.renderer.setSize(window.innerWidth, window.innerHeight);
     };
     this.onWheel = (e) => {
-      if (this.focusedIndex !== null) return;
+      if (!this.inputEnabled || this.focusedIndex !== null) return;
       this.scrollVelocity += e.deltaY * WHEEL_SENSITIVITY;
     };
     this.onPointerDown = (e) => {
+      if (!this.inputEnabled) return;
       this.pointer.down = true;
       this.pointer.moved = 0;
       this.pointer.x = e.clientX;
@@ -197,7 +199,7 @@ export class GalleryScene {
 
   handleClick(e) {
     // ignore clicks on the DOM UI layer
-    if (e.target !== this.canvas) return;
+    if (!this.inputEnabled || e.target !== this.canvas) return;
     if (this.focusedIndex !== null) {
       this.setFocus(null);
       return;
@@ -217,6 +219,23 @@ export class GalleryScene {
   setFocus(index) {
     this.focusedIndex = index;
     this.callbacks.onFocusChange?.(index);
+  }
+
+  setInputEnabled(enabled) {
+    this.inputEnabled = enabled;
+    if (!enabled && this.focusedIndex !== null) this.setFocus(null);
+  }
+
+  // collapse cards back to the center so they bloom outward again —
+  // called when the intro hero is dismissed for a dramatic entrance
+  replayIntro() {
+    this.scroll = (this.cards.length - 1) / 2;
+    this.scrollVelocity = 0;
+    for (const mesh of this.meshes) {
+      mesh.position.set(0, 0, -4);
+      mesh.scale.setScalar(0.6);
+      mesh.material.opacity = 0;
+    }
   }
 
   // ---------- layout targets ----------
