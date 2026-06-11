@@ -1,0 +1,288 @@
+/* gallery.css — overlay UI for the full-screen 3D gallery */
+
+:root {
+  --bg: #0e0e10;
+  --ink: #f2f2f0;
+  --ink-dim: rgba(242, 242, 240, 0.5);
+  --ink-faint: rgba(242, 242, 240, 0.28);
+  --pill-bg: rgba(255, 255, 255, 0.06);
+  --pill-on: #f2f2f0;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+  --sans: 'Space Grotesk', 'Pretendard', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+#root { height: 100%; }
+
+.stage {
+  position: fixed;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 900ms ease;
+}
+.stage.is-ready { opacity: 1; }
+
+.stage-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+
+/* soft edge darkening like the reference footage */
+.stage-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(0, 0, 0, 0.4) 100%);
+}
+
+/* ---------- header ---------- */
+
+.stage-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 26px 30px;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.stage-brand { display: flex; flex-direction: column; gap: 5px; }
+
+.stage-brand-title {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+
+.stage-brand-sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.layout-pills {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--pill-bg);
+  backdrop-filter: blur(12px);
+  pointer-events: auto;
+}
+
+.layout-pill {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--ink-dim);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 200ms ease, background 250ms ease, transform 150ms ease;
+}
+.layout-pill:hover { color: var(--ink); }
+.layout-pill:active { transform: scale(0.96); }
+.layout-pill.on {
+  background: var(--pill-on);
+  color: #111;
+}
+.layout-pill:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* ---------- footer ---------- */
+
+.stage-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 30px;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.stage-footer-left { display: flex; align-items: center; gap: 14px; }
+
+.stage-logo {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-dim);
+}
+
+.stage-hint {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.34em;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+}
+
+.stage-counter {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  color: var(--ink-dim);
+}
+.stage-counter .dash { color: var(--ink-faint); margin: 0 4px; }
+
+/* ---------- focus detail panel ---------- */
+
+.focus-panel {
+  position: absolute;
+  left: 30px;
+  bottom: 76px;
+  z-index: 5;
+  max-width: min(440px, calc(100vw - 60px));
+  padding: 26px 28px;
+  border-radius: 18px;
+  background: rgba(12, 12, 14, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(18px);
+  animation: panel-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.focus-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+}
+
+.focus-title {
+  margin: 10px 0 4px;
+  font-size: clamp(24px, 4vw, 34px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.focus-scope {
+  margin: 0 0 12px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-dim);
+}
+
+.focus-body {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink-dim);
+  word-break: keep-all;
+}
+
+.focus-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.focus-stack span {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--ink-dim);
+}
+
+.focus-role {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--ink-faint);
+}
+
+.focus-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.focus-links a {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  text-decoration: none;
+  width: fit-content;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  padding-bottom: 2px;
+  transition: border-color 200ms ease;
+}
+.focus-links a:hover { border-color: var(--ink); }
+
+.focus-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--ink-dim);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 6px;
+  transition: color 150ms ease, transform 150ms ease;
+}
+.focus-close:hover { color: var(--ink); transform: rotate(90deg); }
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 640px) {
+  .stage-header { padding: 18px 16px; flex-direction: column; gap: 14px; }
+  .layout-pills { align-self: flex-start; }
+  .layout-pill { padding: 7px 13px; font-size: 12px; }
+  .stage-footer { padding: 16px; }
+  .stage-hint { display: none; }
+  .focus-panel { left: 16px; right: 16px; bottom: 64px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage { transition: none; }
+  .focus-panel { animation: none; }
+}
